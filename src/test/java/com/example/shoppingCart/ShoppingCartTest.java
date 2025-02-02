@@ -4,12 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -54,6 +53,13 @@ class ShoppingCartTest {
     @DisplayName("Should throw exception if removed item is null")
     void shouldThrowExceptionIfRemovedItemIsNull() {
         assertThrows(IllegalArgumentException.class, () -> shoppingCart.removeItem(null));
+    }
+
+    @Test
+    @DisplayName("Should throw exception when removing item that does not exist in cart")
+    void shouldThrowExceptionWhenRemovingItemThatDoesNotExistInCart() {
+        Item tomatoItem = new Item("item-1", "Tomato", 5);
+        assertThrows(NoSuchElementException.class, () -> shoppingCart.removeItem(tomatoItem));
     }
 
     //Beräkna totalpris

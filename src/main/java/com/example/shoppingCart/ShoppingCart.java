@@ -2,6 +2,7 @@ package com.example.shoppingCart;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class ShoppingCart {
     private final Map<Item, Integer> cartItems;
@@ -22,6 +23,8 @@ public class ShoppingCart {
     public void removeItem(Item item) {
         if (item == null)
             throw new IllegalArgumentException("Item cannot be null");
+        if (!cartItems.containsKey(item))
+            throw new NoSuchElementException("Item does not exist");
         cartItems.remove(item);
     }
 }
