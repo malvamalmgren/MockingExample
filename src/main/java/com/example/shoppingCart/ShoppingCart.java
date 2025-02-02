@@ -38,4 +38,8 @@ public class ShoppingCart {
 
         return sum;
     }
+
+    public void setQuantity(Item item, Integer quantity) {
+        cartItems.put(item, quantity);
+    }
 }

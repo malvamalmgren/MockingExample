@@ -107,5 +107,13 @@ class ShoppingCartTest {
     }
 
     //Hantera kvantitetsuppdateringar
+    @Test
+    @DisplayName("Should calculate total price based on item quantity in cart")
+    void shouldCalculateTotalPriceBasedOnItemQuantityInCart() {
+        Item oliveOilItem = new Item("item-3", "Olive Oil", 50);
+        shoppingCart.addItem(oliveOilItem);
+        shoppingCart.setQuantity(oliveOilItem, 5);
+        assertThat(shoppingCart.getTotalPrice()).isEqualTo(250);
+    }
 
 }
