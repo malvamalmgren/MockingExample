@@ -29,7 +29,12 @@ class ShoppingCartTest {
         Item tomatoItem = new Item("item-1", "Tomato", 5);
         shoppingCart.addItem(tomatoItem);
         assertThat(shoppingCart.hasItem(tomatoItem)).isTrue();
+    }
 
+    @Test
+    @DisplayName("Should throw exception if added item is null")
+    void shouldThrowExceptionIfAddedItemIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> shoppingCart.addItem(null));
     }
 
     //Ta bort varor
