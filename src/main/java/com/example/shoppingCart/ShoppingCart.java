@@ -12,7 +12,6 @@ public class ShoppingCart {
     public void addItem(Item item) {
         if (item == null)
             throw new IllegalArgumentException("Item cannot be null");
-
         cartItems.put(item, 1);
     }
 
@@ -21,6 +20,8 @@ public class ShoppingCart {
     }
 
     public void removeItem(Item item) {
+        if (item == null)
+            throw new IllegalArgumentException("Item cannot be null");
         cartItems.remove(item);
     }
 }

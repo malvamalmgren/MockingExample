@@ -50,6 +50,12 @@ class ShoppingCartTest {
         assertThat(shoppingCart.hasItem(tomatoItem)).isFalse();
     }
 
+    @Test
+    @DisplayName("Should throw exception if removed item is null")
+    void shouldThrowExceptionIfRemovedItemIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> shoppingCart.removeItem(null));
+    }
+
     //Beräkna totalpris
     //Applicera rabatter
     //Hantera kvantitetsuppdateringar
