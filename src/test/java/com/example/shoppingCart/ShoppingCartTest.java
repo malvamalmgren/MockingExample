@@ -76,6 +76,14 @@ class ShoppingCartTest {
     }
 
     //Applicera rabatter
+    @Test
+    @DisplayName("Should return discounted price after applying discount")
+    void shouldReturnDiscountedPriceAfterApplyingDiscount() {
+        Item oliveOilItem = new Item("item-3", "Olive Oil", 50);
+        oliveOilItem.setDiscount( 0.2);
+        assertThat(oliveOilItem.getPrice()).isEqualTo(40);
+    }
+
     //Hantera kvantitetsuppdateringar
 
 }

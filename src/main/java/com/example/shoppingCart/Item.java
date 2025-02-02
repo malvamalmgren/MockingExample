@@ -16,4 +16,8 @@ public class Item {
     public double getPrice() {
         return price - (price * discount);
     }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
 }
