@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -82,6 +84,14 @@ class ShoppingCartTest {
         Item oliveOilItem = new Item("item-3", "Olive Oil", 50);
         oliveOilItem.setDiscount( 0.2);
         assertThat(oliveOilItem.getPrice()).isEqualTo(40);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"-0.1", "-1", "1", "1.5"})
+    @DisplayName("Should throw exception if discount is invalid")
+    void shouldThrowExceptionIfDiscountIsInvalid(double discount) {
+        Item oliveOilItem = new Item("item-3", "Olive Oil", 50);
+        assertThrows(IllegalArgumentException.class, () -> oliveOilItem.setDiscount(discount));
     }
 
     //Hantera kvantitetsuppdateringar
