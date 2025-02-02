@@ -79,10 +79,10 @@ class ShoppingCartTest {
 
     //Applicera rabatter
     @Test
-    @DisplayName("Should return discounted price after applying discount")
-    void shouldReturnDiscountedPriceAfterApplyingDiscount() {
+    @DisplayName("Should apply item discount when calculating item price")
+    void shouldApplyItemDiscountWhenCalculatingItemPrice() {
         Item oliveOilItem = new Item("item-3", "Olive Oil", 50);
-        oliveOilItem.setDiscount( 0.2);
+        oliveOilItem.setDiscount(0.2);
         assertThat(oliveOilItem.getPrice()).isEqualTo(40);
     }
 
@@ -92,6 +92,18 @@ class ShoppingCartTest {
     void shouldThrowExceptionIfDiscountIsInvalid(double discount) {
         Item oliveOilItem = new Item("item-3", "Olive Oil", 50);
         assertThrows(IllegalArgumentException.class, () -> oliveOilItem.setDiscount(discount));
+    }
+
+    @Test
+    @DisplayName("Should apply item discounts when calculating total price")
+    void shouldApplyItemDiscountsWhenCalculatingTotalPrice() {
+        Item oliveOilItem = new Item("item-3", "Olive Oil", 50);
+        Item coffeeItem = new Item("item-4", "Coffee", 45);
+        oliveOilItem.setDiscount(0.2);
+        coffeeItem.setDiscount(0.1);
+        shoppingCart.addItem(oliveOilItem);
+        shoppingCart.addItem(coffeeItem);
+        assertThat(shoppingCart.getTotalPrice()).isEqualTo(80.5);
     }
 
     //Hantera kvantitetsuppdateringar

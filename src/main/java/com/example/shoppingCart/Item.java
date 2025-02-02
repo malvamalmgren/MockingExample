@@ -18,7 +18,7 @@ public class Item {
     }
 
     public void setDiscount(double discount) {
-        if (discount < 0||discount >= 1)
+        if (discount < 0 || discount >= 1)
             throw new IllegalArgumentException("discount must be between 0 and 1");
         this.discount = discount;
     }
