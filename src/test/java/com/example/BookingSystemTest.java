@@ -261,5 +261,65 @@ class BookingSystemTest {
                     .isTrue();
         }
     }
+    //________________________________________________________________________________________________
+    // cancelBooking
 
+    @Nested
+    @DisplayName("Tests for cancelBooking")
+    class CancelBookingTests {
+
+        @Test
+        @DisplayName("Should throw exception if bookingId is null")
+        void shouldThrowExceptionIfBookingIdIsNull() {
+            assertThatThrownBy(() -> bookingSystem.cancelBooking(null))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Boknings-id kan inte vara null");
+        }
+
+        @Test
+        @DisplayName("Should return false if the repository has no rooms")
+        void shouldReturnFalseIfRepositoryHasNoRooms() {
+            when(roomRepository.findAll()).thenReturn(Collections.emptyList());
+            assertThat(bookingSystem.cancelBooking("bookingId")).isFalse();
+        }
+
+        @ParameterizedTest
+        @CsvSource({"-2, -1", "-1, 1"})
+        @DisplayName("Should throw exception if booking has already started or ended")
+        void shouldThrowExceptionIfBookingHasAlreadyStartedOrEnded(int startOffset, int endOffset) {
+            when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+            LocalDateTime now = timeProvider.getCurrentTime();
+            LocalDateTime startTime = timeProvider.getCurrentTime().plusHours(startOffset);
+            LocalDateTime endTime = timeProvider.getCurrentTime().plusHours(endOffset);
+            String bookingId = "bookingId";
+
+            Booking pastBooking = new Booking(bookingId, "room1", now.minusHours(2), now.minusHours(1));
+            Room room = Mockito.mock(Room.class);
+            when(room.hasBooking(bookingId)).thenReturn(true);
+            when(room.getBooking(bookingId)).thenReturn(pastBooking);
+            when(roomRepository.findAll()).thenReturn(List.of(room));
+
+            assertThatThrownBy(() -> bookingSystem.cancelBooking(bookingId))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage("Kan inte avboka påbörjad eller avslutad bokning");
+        }
+
+        @Test
+        @DisplayName("Should return room with booking")
+        void shouldReturnRoomWithBooking() {
+            when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+            LocalDateTime now = timeProvider.getCurrentTime();
+            LocalDateTime startTime = now.plusHours(1);
+            LocalDateTime endTime = now.plusHours(2);
+
+            Room room = Mockito.mock(Room.class);
+            String bookingId = "bookingId";
+            Booking booking = new Booking(bookingId, "room1", startTime, endTime);
+            when(room.hasBooking(bookingId)).thenReturn(true);
+            when(room.getBooking(bookingId)).thenReturn(booking);
+            when(roomRepository.findAll()).thenReturn(List.of(room));
+
+            assertThat(bookingSystem.cancelBooking(bookingId)).isTrue();
+        }
+    }
 }
