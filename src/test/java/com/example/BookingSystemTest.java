@@ -175,4 +175,91 @@ class BookingSystemTest {
                     .isTrue();
         }
     }
+
+    //________________________________________________________________________________________________
+
+    //getAvailableRooms
+    @Nested
+    @DisplayName("Tests for getAvailableRooms")
+    class GetAvailableRoomsTests {
+
+        @DisplayName("Should throw exception for invalid getAvailableRooms times")
+        @ParameterizedTest
+        @MethodSource("invalidTimesForGetAvailableRooms")
+        void shouldThrowExceptionForInvalidGetAvailableRoomsTimes(LocalDateTime startTime, LocalDateTime endTime, String expectedMessage) {
+            assertThatThrownBy(() -> bookingSystem.getAvailableRooms(startTime, endTime))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage(expectedMessage);
+        }
+
+        private static Stream<Arguments> invalidTimesForGetAvailableRooms() {
+            LocalDateTime now = LocalDateTime.of(2025, 3, 3, 10, 0);
+            return Stream.of(
+                    Arguments.of(null, now.plusHours(2), "Måste ange både start- och sluttid"),
+                    Arguments.of(now.plusHours(1), null, "Måste ange både start- och sluttid"),
+                    Arguments.of(now.plusHours(2), now.plusHours(1), "Sluttid måste vara efter starttid")
+            );
+        }
+
+    /*
+    @Test
+    @DisplayName("Should throw IllegalArgumentException if startTime is null")
+    void shouldThrowIllegalArgumentExceptionIfStartTimeIsNull() {
+        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+        LocalDateTime startTime = null;
+        LocalDateTime endTime = timeProvider.getCurrentTime().plusHours(2);
+
+        assertThatThrownBy(() -> bookingSystem.getAvailableRooms(startTime, endTime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Måste ange både start- och sluttid");
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException if endTime is null")
+    void shouldThrowIllegalArgumentExceptionIfEndTimeIsNull() {
+        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+        LocalDateTime startTime = timeProvider.getCurrentTime().plusHours(1);
+        LocalDateTime endTime = null;
+
+        assertThatThrownBy(() -> bookingSystem.getAvailableRooms(startTime, endTime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Måste ange både start- och sluttid");
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException if endTime is before startTime")
+    void shouldThrowIllegalArgumentExceptionIfEndTimeIsBeforeStartTime() {
+        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+        LocalDateTime startTime = timeProvider.getCurrentTime().plusHours(3);
+        LocalDateTime endTime = timeProvider.getCurrentTime().plusHours(2);
+
+        assertThatThrownBy(() -> bookingSystem.getAvailableRooms(startTime, endTime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Sluttid måste vara efter starttid");
+    }
+     */
+
+        @Test
+        @DisplayName("Should return available rooms")
+        void shouldReturnAvailableRooms() {
+            when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+            LocalDateTime startTime = timeProvider.getCurrentTime().plusHours(1);
+            LocalDateTime endTime = timeProvider.getCurrentTime().plusHours(2);
+
+            // Create two mock rooms, one available, one not
+            Room roomA = Mockito.mock(Room.class);
+            Room roomB = Mockito.mock(Room.class);
+            when(roomA.isAvailable(startTime, endTime)).thenReturn(true);
+            when(roomB.isAvailable(startTime, endTime)).thenReturn(false);
+
+            List<Room> allRooms = List.of(roomA, roomB);
+            when(roomRepository.findAll()).thenReturn(allRooms);
+
+            List<Room> available = bookingSystem.getAvailableRooms(startTime, endTime);
+
+            assertThat(bookingSystem.getAvailableRooms(startTime, endTime).contains(roomA))
+                    .isTrue();
+        }
+    }
+
 }
