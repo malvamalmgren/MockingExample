@@ -12,4 +12,8 @@ public class Item {
         this.price = price;
         this.discount = 0;
     }
+
+    public double getPrice() {
+        return price - (price * discount);
+    }
 }

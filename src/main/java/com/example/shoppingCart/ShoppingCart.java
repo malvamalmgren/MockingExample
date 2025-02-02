@@ -27,4 +27,15 @@ public class ShoppingCart {
             throw new NoSuchElementException("Item does not exist");
         cartItems.remove(item);
     }
+
+    public double getTotalPrice() {
+        double sum = 0.0;
+        for (Map.Entry<Item, Integer> cartItem : cartItems.entrySet()) {
+            Item item = cartItem.getKey();
+            int quantity = cartItem.getValue();
+            sum += item.getPrice() * quantity;
+        }
+
+        return sum;
+    }
 }

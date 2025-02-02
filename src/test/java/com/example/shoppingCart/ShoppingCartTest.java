@@ -63,6 +63,18 @@ class ShoppingCartTest {
     }
 
     //Beräkna totalpris
+    @Test
+    @DisplayName("Should return accurate total price")
+    void shouldReturnAccurateTotalPrice() {
+        Item tomatoItem = new Item("item-1", "Tomato", 5);
+        Item garlicItem = new Item("item-2", "Garlic", 1.5);
+        Item oliveOilItem = new Item("item-3", "Olive Oil", 50);
+        shoppingCart.addItem(tomatoItem);
+        shoppingCart.addItem(garlicItem);
+        shoppingCart.addItem(oliveOilItem);
+        assertThat(shoppingCart.getTotalPrice()).isEqualTo(56.5);
+    }
+
     //Applicera rabatter
     //Hantera kvantitetsuppdateringar
 
