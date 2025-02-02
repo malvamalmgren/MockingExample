@@ -19,4 +19,8 @@ public class ShoppingCart {
     public boolean hasItem(Item item) {
         return cartItems.containsKey(item);
     }
+
+    public void removeItem(Item item) {
+        cartItems.remove(item);
+    }
 }
