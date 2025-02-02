@@ -116,4 +116,12 @@ class ShoppingCartTest {
         assertThat(shoppingCart.getTotalPrice()).isEqualTo(250);
     }
 
+    @Test
+    @DisplayName("Should throw exception if quantity is invalid")
+    void shouldThrowExceptionIfQuantityIsInvalid() {
+        Item oliveOilItem = new Item("item-3", "Olive Oil", 50);
+        shoppingCart.addItem(oliveOilItem);
+        assertThrows(IllegalArgumentException.class, () -> shoppingCart.setQuantity(oliveOilItem, -5));
+    }
+
 }
