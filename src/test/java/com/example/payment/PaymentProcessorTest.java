@@ -29,4 +29,12 @@ class PaymentProcessorTest {
         verify(paymentDatabase, atLeastOnce()).executeUpdate(anyString());
     }
 
+    @Test
+    @DisplayName("Should use sendPaymentConfirmation when processPayment is successful")
+    void shouldUseSendPaymentConfirmationWhenProcessPaymentIsSuccessful() {
+        when(paymentGateway.charge(anyString(), anyDouble())).thenReturn(new PaymentApiResponse(true));
+        paymentProcessor.processPayment(100);
+        verify(notificationService, atLeastOnce()).sendPaymentConfirmation(anyString(), anyDouble());
+    }
+
 }
