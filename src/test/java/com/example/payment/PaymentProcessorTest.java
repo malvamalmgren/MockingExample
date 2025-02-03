@@ -37,4 +37,11 @@ class PaymentProcessorTest {
         verify(notificationService, atLeastOnce()).sendPaymentConfirmation(anyString(), anyDouble());
     }
 
+    @Test
+    @DisplayName("Should not executeUpdate when processPayment is unsuccessful")
+    void shouldNotExecuteUpdateWhenProcessPaymentIsUnsuccessful() {
+        when(paymentGateway.charge(anyString(), anyDouble())).thenReturn(new PaymentApiResponse(false));
+        paymentProcessor.processPayment(100);
+        verify(paymentDatabase, never()).executeUpdate(anyString());
+    }
 }
