@@ -16,11 +16,11 @@ public class PaymentProcessor {
     //Changed method to use DI variables
     public boolean processPayment(double amount) {
         PaymentApiResponse response = paymentGateway.charge(API_KEY, amount);
-        if (response.isSuccess()) {
+        if (response.success()) {
             paymentDatabase
                     .executeUpdate("INSERT INTO payments (amount, status) VALUES (" + amount + ", 'SUCCESS')");
             notificationService.sendPaymentConfirmation("user@example.com", amount);
         }
-        return response.isSuccess();
+        return response.success();
     }
 }

@@ -5,11 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentProcessorTest {
+
+    @InjectMocks
+    PaymentProcessor paymentProcessor;
 
     @Mock
     PaymentGateway paymentGateway;
@@ -18,15 +22,12 @@ class PaymentProcessorTest {
     @Mock
     NotificationService notificationService;
 
-    @InjectMocks
-    PaymentProcessor paymentProcessor;
-
     @Test
     @DisplayName("Should use executeUpdate when processPayment is successful")
-    void paymentApiResponsShouldReturnFalseIfAmountIsInvalid() {
+    void shouldUseExecuteUpdateWhenProcessPaymentIsSuccessful() {
         when(paymentGateway.charge(anyString(), anyDouble())).thenReturn(new PaymentApiResponse(true));
         paymentProcessor.processPayment(100);
-        verify(paymentDatabase, atLeastOnce()).executeUpdate(anyString());
+        verify(paymentDatabase, Mockito.times(1)).executeUpdate(anyString());
     }
 
     @Test
@@ -34,7 +35,7 @@ class PaymentProcessorTest {
     void shouldUseSendPaymentConfirmationWhenProcessPaymentIsSuccessful() {
         when(paymentGateway.charge(anyString(), anyDouble())).thenReturn(new PaymentApiResponse(true));
         paymentProcessor.processPayment(100);
-        verify(notificationService, atLeastOnce()).sendPaymentConfirmation(anyString(), anyDouble());
+        verify(notificationService, Mockito.times(1)).sendPaymentConfirmation(anyString(), anyDouble());
     }
 
     @Test
