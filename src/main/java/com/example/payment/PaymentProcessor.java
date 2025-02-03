@@ -20,7 +20,6 @@ public class PaymentProcessor {
             paymentDatabase
                     .executeUpdate("INSERT INTO payments (amount, status) VALUES (" + amount + ", 'SUCCESS')");
             notificationService.sendPaymentConfirmation("user@example.com", amount);
-
         }
         return response.isSuccess();
     }
