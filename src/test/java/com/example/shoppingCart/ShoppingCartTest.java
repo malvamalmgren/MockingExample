@@ -6,11 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,6 +41,25 @@ class ShoppingCartTest {
     @DisplayName("Should throw exception if added item is null")
     void shouldThrowExceptionIfAddedItemIsNull() {
         assertThrows(IllegalArgumentException.class, () -> shoppingCart.addItem(null));
+    }
+
+    //Konstruktor
+    @ParameterizedTest
+    @MethodSource("invalidItemsProvider")
+    @DisplayName("Should throw exception if parameters are invalid when creating new item")
+    void shouldThrowExceptionIfParametersAreInvalidWhenCreatingNewItem(String id, String name, double price) {
+        assertThrows(IllegalArgumentException.class, () -> new Item(id, name, price));
+    }
+
+    static Stream<Object[]> invalidItemsProvider() {
+        return Stream.of(
+                new Object[]{null, "Lettuce", 5.0},
+                new Object[]{"", "Lettuce", 5.0},
+                new Object[]{"item-4", null, 5.0},
+                new Object[]{"item-4", "", 5.0},
+                new Object[]{"item-4", "Lettuce", 0},
+                new Object[]{"item-4", "Lettuce", -5}
+        );
     }
 
     //Ta bort varor

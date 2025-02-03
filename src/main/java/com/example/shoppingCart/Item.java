@@ -7,6 +7,9 @@ public class Item {
     private double discount;
 
     public Item(String id, String name, double price) {
+        if (id == null || id == "") throw new IllegalArgumentException("id cannot be empty");
+        if (name == null || name == "") throw new IllegalArgumentException("name cannot be empty");
+        if (price <= 0) throw new IllegalArgumentException("price cannot be 0 or less");
         this.id = id;
         this.name = name;
         this.price = price;
