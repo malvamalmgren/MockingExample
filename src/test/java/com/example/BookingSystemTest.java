@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -22,10 +21,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.*;
 
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BookingSystemTest {
@@ -35,11 +32,11 @@ class BookingSystemTest {
     @Mock
     private Room room;
     @Mock
-    private NotificationService notificationService;
-    @Mock
     private RoomRepository roomRepository;
     @Mock
     private TimeProvider timeProvider;
+    @Mock
+    private NotificationService notificationService;
 
     //bookRoom
     @Nested
@@ -47,14 +44,14 @@ class BookingSystemTest {
     class BookRoomTests {
         @DisplayName("Should throw exception for invalid arguments")
         @ParameterizedTest
-        @MethodSource("invalidArguments")
-        void shouldThrowExceptionForInvalidArguments(String roomId, LocalDateTime startTime, LocalDateTime endTime, String expectedMessage) {
+        @MethodSource("invalidArgumentsProvider")
+        void shouldThrowExceptionForInvalidArgumentsProvider(String roomId, LocalDateTime startTime, LocalDateTime endTime, String expectedMessage) {
             assertThatThrownBy(() -> bookingSystem.bookRoom(roomId, startTime, endTime))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(expectedMessage);
         }
 
-        static Stream<Arguments> invalidArguments() {
+        static Stream<Arguments> invalidArgumentsProvider() {
             LocalDateTime now = LocalDateTime.of(2025, 3, 3, 10, 0);
             String message = "Bokning kräver giltiga start- och sluttider samt rum-id";
             return Stream.of(
@@ -62,40 +59,6 @@ class BookingSystemTest {
                     Arguments.of("room1", null, now.plusHours(2), message),
                     Arguments.of("room1", now.plusHours(1), null, message));
         }
-    /*
-    @Test
-    @DisplayName("Should throw IllegalArgumentException when roomId is null")
-    void shouldThrowIllegalArgumentExceptionWhenRoomIdIsNull() {
-        LocalDateTime startTime = LocalDateTime.of(2025, 3, 3, 12, 0);
-        LocalDateTime endTime = LocalDateTime.of(2025, 3, 3, 14, 0);
-
-        assertThatThrownBy(() -> bookingSystem.bookRoom(null, startTime, endTime))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Bokning kräver giltiga start- och sluttider samt rum-id");
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalArgumentException when startTime is null")
-    void shouldThrowIllegalArgumentExceptionWhenStartTimeIsNull() {
-        LocalDateTime startTime = null;
-        LocalDateTime endTime = LocalDateTime.of(2025, 3, 3, 12, 0);
-
-        assertThatThrownBy(() -> bookingSystem.bookRoom("1", startTime, endTime))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Bokning kräver giltiga start- och sluttider samt rum-id");
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalArgumentException when endTime is null")
-    void shouldThrowIllegalArgumentExceptionWhenEndTimeIsNull() {
-        LocalDateTime startTime = LocalDateTime.of(2025, 3, 3, 12, 0);
-        LocalDateTime endTime = null;
-
-        assertThatThrownBy(() -> bookingSystem.bookRoom("1", startTime, endTime))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Bokning kräver giltiga start- och sluttider samt rum-id");
-    }
-    */
 
         @Test
         @DisplayName("Should throw IllegalArgumentException if given past startTime")
@@ -138,9 +101,9 @@ class BookingSystemTest {
         void shouldNotThrowExceptionIfRoomExists() {
             when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
             when(roomRepository.findById("room1")).thenReturn(Optional.of(room));
-            LocalDateTime startTime = timeProvider.getCurrentTime().plusHours(1);
-            LocalDateTime endTime = timeProvider.getCurrentTime().plusHours(2);
-            // Make sure room *is* available
+            LocalDateTime now = timeProvider.getCurrentTime();
+            LocalDateTime startTime = now.plusHours(1);
+            LocalDateTime endTime = now.plusHours(2);
             when(room.isAvailable(startTime, endTime)).thenReturn(true);
 
             assertThat(bookingSystem.bookRoom("room1", startTime, endTime))
@@ -154,8 +117,6 @@ class BookingSystemTest {
             when(roomRepository.findById("room1")).thenReturn(Optional.of(room));
             LocalDateTime startTime = timeProvider.getCurrentTime().plusHours(1);
             LocalDateTime endTime = timeProvider.getCurrentTime().plusHours(2);
-
-            // Make sure room is not available for those times
             when(room.isAvailable(startTime, endTime)).thenReturn(false);
 
             assertThat(bookingSystem.bookRoom("room1", startTime, endTime))
@@ -176,23 +137,21 @@ class BookingSystemTest {
         }
     }
 
-    //________________________________________________________________________________________________
-
-    //getAvailableRooms
+    // getAvailableRooms
     @Nested
     @DisplayName("Tests for getAvailableRooms")
     class GetAvailableRoomsTests {
 
         @DisplayName("Should throw exception for invalid getAvailableRooms times")
         @ParameterizedTest
-        @MethodSource("invalidTimesForGetAvailableRooms")
+        @MethodSource("invalidTimesProvider")
         void shouldThrowExceptionForInvalidGetAvailableRoomsTimes(LocalDateTime startTime, LocalDateTime endTime, String expectedMessage) {
             assertThatThrownBy(() -> bookingSystem.getAvailableRooms(startTime, endTime))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(expectedMessage);
         }
 
-        private static Stream<Arguments> invalidTimesForGetAvailableRooms() {
+        private static Stream<Arguments> invalidTimesProvider() {
             LocalDateTime now = LocalDateTime.of(2025, 3, 3, 10, 0);
             return Stream.of(
                     Arguments.of(null, now.plusHours(2), "Måste ange både start- och sluttid"),
@@ -201,69 +160,25 @@ class BookingSystemTest {
             );
         }
 
-    /*
-    @Test
-    @DisplayName("Should throw IllegalArgumentException if startTime is null")
-    void shouldThrowIllegalArgumentExceptionIfStartTimeIsNull() {
-        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
-        LocalDateTime startTime = null;
-        LocalDateTime endTime = timeProvider.getCurrentTime().plusHours(2);
-
-        assertThatThrownBy(() -> bookingSystem.getAvailableRooms(startTime, endTime))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Måste ange både start- och sluttid");
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalArgumentException if endTime is null")
-    void shouldThrowIllegalArgumentExceptionIfEndTimeIsNull() {
-        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
-        LocalDateTime startTime = timeProvider.getCurrentTime().plusHours(1);
-        LocalDateTime endTime = null;
-
-        assertThatThrownBy(() -> bookingSystem.getAvailableRooms(startTime, endTime))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Måste ange både start- och sluttid");
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalArgumentException if endTime is before startTime")
-    void shouldThrowIllegalArgumentExceptionIfEndTimeIsBeforeStartTime() {
-        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
-        LocalDateTime startTime = timeProvider.getCurrentTime().plusHours(3);
-        LocalDateTime endTime = timeProvider.getCurrentTime().plusHours(2);
-
-        assertThatThrownBy(() -> bookingSystem.getAvailableRooms(startTime, endTime))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Sluttid måste vara efter starttid");
-    }
-     */
-
         @Test
         @DisplayName("Should return available rooms")
         void shouldReturnAvailableRooms() {
             when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
             LocalDateTime startTime = timeProvider.getCurrentTime().plusHours(1);
             LocalDateTime endTime = timeProvider.getCurrentTime().plusHours(2);
-
-            // Create two mock rooms, one available, one not
             Room roomA = Mockito.mock(Room.class);
             Room roomB = Mockito.mock(Room.class);
             when(roomA.isAvailable(startTime, endTime)).thenReturn(true);
             when(roomB.isAvailable(startTime, endTime)).thenReturn(false);
-
             List<Room> allRooms = List.of(roomA, roomB);
             when(roomRepository.findAll()).thenReturn(allRooms);
-
-            List<Room> available = bookingSystem.getAvailableRooms(startTime, endTime);
 
             assertThat(bookingSystem.getAvailableRooms(startTime, endTime).contains(roomA))
                     .isTrue();
         }
     }
-    //________________________________________________________________________________________________
-    // cancelBooking
 
+    // cancelBooking
     @Nested
     @DisplayName("Tests for cancelBooking")
     class CancelBookingTests {
@@ -289,11 +204,11 @@ class BookingSystemTest {
         void shouldThrowExceptionIfBookingHasAlreadyStartedOrEnded(int startOffset, int endOffset) {
             when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
             LocalDateTime now = timeProvider.getCurrentTime();
-            LocalDateTime startTime = timeProvider.getCurrentTime().plusHours(startOffset);
-            LocalDateTime endTime = timeProvider.getCurrentTime().plusHours(endOffset);
+            LocalDateTime startTime = now.plusHours(startOffset);
+            LocalDateTime endTime = now.plusHours(endOffset);
             String bookingId = "bookingId";
 
-            Booking pastBooking = new Booking(bookingId, "room1", now.minusHours(2), now.minusHours(1));
+            Booking pastBooking = new Booking(bookingId, "room1", startTime, endTime);
             Room room = Mockito.mock(Room.class);
             when(room.hasBooking(bookingId)).thenReturn(true);
             when(room.getBooking(bookingId)).thenReturn(pastBooking);
